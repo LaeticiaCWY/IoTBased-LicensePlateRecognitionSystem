@@ -1,0 +1,7 @@
+conda activate myenv1
+cd C:\Users\Laeticia\lpr_app\webSocket-App
+python server.py
+
+conda activate myenv1
+cd C:\Users\Laeticia\lpr_app\webSocket-App\front-end
+npm start
