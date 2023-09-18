@@ -1,61 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import './App.css';
+import "./App.css";
+import HttpCall from "./components/HttpCall";
+import WebSocketCall from "./components/WebSocketCall";
+import { io } from "socket.io-client";
+import { useEffect, useState } from "react";
 
 function App() {
-  const [webcamImage, setWebcamImage] = useState('');
-  const [vehicleDetection, setVehicleDetection] = useState('');
-  const [licensePlateDetection, setLicensePlateDetection] = useState('');
-  const [characterRecognition, setCharacterRecognition] = useState('');
+  const [socketInstance, setSocketInstance] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [buttonStatus, setButtonStatus] = useState(false);
+
+  const handleClick = () => {
+    if (buttonStatus === false) {
+      setButtonStatus(true);
+    } else {
+      setButtonStatus(false);
+    }
+  };
 
   useEffect(() => {
-    // Create a WebSocket connection
-    const ws = new WebSocket('ws://localhost:5000/ws');
+    if (buttonStatus === true) {
+      const socket = io("localhost:5000/", {
+        transports: ["websocket"],
+        cors: {
+          origin: "http://localhost:3000/",
+        },
+      });
 
-    // Set up event listeners for incoming WebSocket messages
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      switch (data.type) {
-        case 'webcam_image':
-          setWebcamImage(data.data);
-          break;
-        case 'vehicle_detection':
-          setVehicleDetection(data.data);
-          break;
-        case 'license_plate_detection':
-          setLicensePlateDetection(data.data);
-          break;
-        case 'character_recognition':
-          setCharacterRecognition(data.data);
-          break;
-        default:
-          break;
-      }
-    };
+      setSocketInstance(socket);
 
-    // Close the WebSocket connection when the component unmounts
-    return () => {
-      ws.close();
-    };
-  }, []);
+      socket.on("connect", (data) => {
+        console.log(data);
+      });
+
+      setLoading(false);
+
+      socket.on("disconnect", (data) => {
+        console.log(data);
+      });
+
+      return function cleanup() {
+        socket.disconnect();
+      };
+    }
+  }, [buttonStatus]);
 
   return (
     <div className="App">
-      <div className="outlined-box">
-        <h3>Webcam Image</h3>
-        <p>{webcamImage}</p>
+      <h1>React/Flask App + socket.io</h1>
+      <div className="line">
+        <HttpCall />
       </div>
-      <div className="outlined-box">
-        <h3>Vehicle Detection</h3>
-        <p>{vehicleDetection}</p>
-      </div>
-      <div className="outlined-box">
-        <h3>License Plate Detection</h3>
-        <p>{licensePlateDetection}</p>
-      </div>
-      <div className="outlined-box">
-        <h3>Character Recognition</h3>
-        <p>{characterRecognition}</p>
-      </div>
+      {!buttonStatus ? (
+        <button onClick={handleClick}>turn chat on</button>
+      ) : (
+        <>
+          <button onClick={handleClick}>turn chat off</button>
+          <div className="line">
+            {!loading && <WebSocketCall socket={socketInstance} />}
+          </div>
+        </>
+      )}
     </div>
   );
 }
