@@ -1,0 +1,1 @@
+When connected on phone, the server can detect that there is a device on it, but it is not connected to server. This means that I can see the chatapp on the phone but cannot send or recieve messages
