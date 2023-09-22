@@ -1,0 +1,5 @@
+#define BLYNK_TEMPLATE_ID "TMPL6SfFDo60n"
+#define BLYNK_TEMPLATE_NAME "Quickstart Template"
+#define BLYNK_AUTH_TOKEN "gMmSEzmGcGKakYppe5e3u4cTK4Joahko"
+#define WIFI_SSID "dlink-6930-5GHz"
+#define WIFI_PASS "1permai8"
