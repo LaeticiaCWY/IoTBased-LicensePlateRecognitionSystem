@@ -1,0 +1,149 @@
+import React, { useEffect, useState } from "react";
+import { database } from "./firebase"; // Import Firebase database
+import './styles.css';
+
+const ImageDisplay = () => {
+  const [imageUrl1, setImageUrl1] = useState(""); // State for the first image URL
+  const [imageUrl2, setImageUrl2] = useState(""); // State for the second image URL
+
+  useEffect(() => {
+    // Reference to the first image URL in Firebase Realtime Database
+    const dbRef1 = database.ref("lpr/YOLO_url"); // Replace with your database path for the first image
+
+    // Add a listener to listen for changes to the first image URL
+    dbRef1.on("value", (snapshot) => {
+      const url = snapshot.val(); // Get the updated image URL from the snapshot
+      setImageUrl1(url); // Set the first image URL to state
+      console.log("First Image URL updated:", url); // Log the URL when it's updated
+    });
+
+    // Reference to the second image URL in Firebase Realtime Database
+    const dbRef2 = database.ref("lpr/WPOD-NET_url"); // Replace with your database path for the second image
+
+    // Add a listener to listen for changes to the second image URL
+    dbRef2.on("value", (snapshot) => {
+      const url = snapshot.val(); // Get the updated image URL from the snapshot
+      setImageUrl2(url); // Set the second image URL to state
+      console.log("Second Image URL updated:", url); // Log the URL when it's updated
+    });
+
+    // Remove the listeners when the component unmounts to prevent memory leaks
+    return () => {
+      dbRef1.off("value");
+      dbRef2.off("value");
+    };
+  }, []);
+
+  return (
+   <div>
+      <h2 style={{ textAlign: "center", color: "#000", fontSize: "35px" }}>License Plate Recognition System</h2>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        textAlign: "center",
+        marginLeft: "10%", // Adjust the left margin for placement
+        marginRight: "10%", // Adjust the right margin for placement
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "75vh", // Make the container at least the height of the viewport
+          textAlign: "center",
+          height: "100%", // Set the height to 100% for vertical alignment
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center", // Center horizontally within the container
+            maxWidth: "90%", // Adjust the width of the container
+          }}
+        >
+          <div
+            style={{
+              flex: "1",
+              textAlign: "center",
+            }}
+          >
+            {imageUrl1 && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: "50vh", // Make the container at least the height of the viewport
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ textAlign: "center", maxWidth: "100%", maxHeight: "350px", margin: "0 auto" }}>
+                  <img
+                    src={imageUrl1}
+                    alt=""
+                    key={imageUrl1}
+                    style={{
+                      display: "block",
+                      margin: "0 auto",
+                      width: "450px", // Set the fixed width of the container
+                      height: "350px", // Set the fixed height of the container
+                      objectFit: "cover", // Crop the image to fit within the fixed dimensions
+                      border: "2px solid black", // Border style applied to the image
+                    }}
+                  />
+                  <p style={{ margin: "10px 0 0", fontSize: "18px", fontWeight: "bold" }}>Vehicle Image</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          flex: "1",
+          maxWidth: "45%",
+          display: "inline-block",
+          textAlign: "center",
+        }}
+      >
+        {imageUrl2 && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "70vh", // Center vertically within the viewport
+              textAlign: "center",
+            }}
+          >
+            <div style={{ textAlign: "center", maxWidth: "100%", maxHeight: "350px", margin: "0 auto" }}>
+              <img
+                src={imageUrl2}
+                alt=""
+                key={imageUrl2}
+                style={{
+                  display: "block",
+                  margin: "0 auto",
+                  width: "400px", // Set the fixed width of the container (adjust as needed)
+                  height: "200px", // Set the fixed height of the container (adjust as needed)
+                  objectFit: "cover", // Crop the image to fit within the fixed dimensions
+                  border: "2px solid black", // Border style applied to the image
+                }}
+              />
+              <p style={{ margin: "10px 0 0", fontSize: "18px", fontWeight: "bold" }}>WPOD-NET Image</p>
+              <h2 style={{ position: "absolute", top: "0px", right: "500px", color: "#000", fontSize: "35px" }}>License Plate Recognition System</h2>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ImageDisplay;
